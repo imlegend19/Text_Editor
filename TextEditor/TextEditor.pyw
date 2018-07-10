@@ -1,6 +1,6 @@
 from tkinter import *
 import os
-import tkinter.filedialog
+import tkinter.filedialog # tkFileDialog is a module with open and save dialog functions
 import tkinter.messagebox
 
 root = Tk()  # initialising a tkinter window
@@ -8,7 +8,7 @@ root.iconbitmap('icons/favicon.ico')  # setting an icon for our app
 
 PROGRAM_NAME = "TextEditor"  # Name for our app
 root.title(PROGRAM_NAME)
-file_name = None
+file_name = None # A global variable declared to be used over and over in the program
 root.geometry('800x400')  # geometry for our window
 
 # all codes goes here
@@ -17,11 +17,13 @@ root.geometry('800x400')  # geometry for our window
 # FILE MENU
 
 # This function is basically tu create a new file
-def new_file(event=None):
+def new_file(event=None): #A Tkinter application runs most of its time inside an event loop, which is entered via the mainloop method. It waiting for events to happen.
+    # There are various types of events, hence. Here the type of the event is 'none'
     root.title("Untitled")  # default name of a new file
     global file_name
     file_name = None
-    content_text.delete(1.0, END)
+    content_text.delete(1.0, END) #Text is a widget in the tkinter. '.delete' is a function used to clear the text
+    # This would begin from the beginning to the end of he text
     on_content_changed()
 
 
@@ -46,13 +48,14 @@ def open_file(event=None):
                                                                                              ("HTML", "*.html"),
                                                                                              ("CSS", "*.css"),
                                                                                              ("JavaScript", "*.js")])
+    # it is file dialog that requests the selection of an existing file
     if input_file_name:
-        global file_name
+        global file_name # the global variable
         file_name = input_file_name  # the path of the selected file is stored in this variable
-        root.title('{} - {}'.format(os.path.basename(file_name), PROGRAM_NAME))
+        root.title('{} - {}'.format(os.path.basename(file_name), PROGRAM_NAME)) # changing the title to that of the new file
         content_text.delete(1.0, END)
         with open(file_name) as _file:
-            content_text.insert(1.0, _file.read())
+            content_text.insert(1.0, _file.read()) # function to read the file requested
     
     on_content_changed()
 
@@ -67,7 +70,7 @@ def write_to_file(file_name):
         # -2c would mean delete two characters, and so on
         content = content_text.get(1.0, 'end-1c')
         with open(file_name, 'w') as the_file:
-            the_file.write(content)
+            the_file.write(content) # function to write to the mentioned file
     except IOError:
         pass  
 
@@ -79,10 +82,12 @@ def save_as(event=None):
                                                                                                ("HTML", "*.html"),
                                                                                                ("CSS", "*.css"),
                                                                                                ("JavaScript", "*.js")])
+    # File dailog that requests creation or replacement of a file
     if input_file_name:
         global file_name
         file_name = input_file_name  # path is stored here
         write_to_file(file_name)  # this will write a file
+        # a function already defined above
         root.title('{} - {}'.format(os.path.basename(file_name), PROGRAM_NAME))
     return "break"
     
@@ -99,6 +104,7 @@ def save(event=None):
 
 
 #EDIT MENU
+# These are various typs of event bidings through which events can be generated to cut/cop/paste text or undo operations
 def cut():
     content_text.event_generate("<<Cut>>")
     on_content_changed()
@@ -129,8 +135,11 @@ def selectall(event=None):
    
 def find_text(event=None):
     search_toplevel = Toplevel(root)
+    #The Toplevel is a widget used to display new windows, dialogs, and other pop up windows
     search_toplevel.title('Find Text')
     search_toplevel.transient(root)
+    #Makes window a transient window for the given master 
+    # Here root is the master/parent
     search_toplevel.resizable(False, False)
     Label(search_toplevel, text="Find All:").grid(row=0, column=0, sticky='e')
     search_entry_widget = Entry(search_toplevel, width=25)
@@ -143,6 +152,7 @@ def find_text(event=None):
                search_entry_widget.get(), ignore_case_value.get(),
                content_text, search_toplevel, search_entry_widget)
            ).grid(row=0, column=2, sticky='e' + 'w', padx=2, pady=2)
+    # we will get the text to be found as an input from the user and then pass the string as an arguement to be searched in our text
 
     def close_search_window():
         content_text.tag_remove('match', '1.0', END)
@@ -169,6 +179,7 @@ def search_output(needle,if_ignore_case, content_text, search_toplevel, search_b
     search_toplevel.title('{} matches found'.format(matches_found))
 
 #ABOUT MENU
+# message boxes help us to display any information we need to, on the window
 
 def display_about(event=None):
     tkinter.messagebox.showinfo(
@@ -186,6 +197,7 @@ def exit_editor(event=None):
         root.destroy()
 
 #adding Line Numbers Functionality
+# this will help us to count the number of lines in the user's text
 def get_line_numbers():
     output = ''
     if show_line_number.get():
@@ -194,6 +206,7 @@ def get_line_numbers():
             output += str(i) + '\n'
     return output
 
+# everytime the content in the editor are updated, this function is run to update the attributes
 def on_content_changed(event=None):
     update_line_numbers()
     update_cursor()
@@ -206,6 +219,7 @@ def update_line_numbers(event=None):
     line_number_bar.config(state='disabled')
 
 # Adding Cursor Functionality
+# we use the cursor functions and its various attributes
 def show_cursor():
     show_cursor_info_checked = show_cursor_info.get()
     if show_cursor_info_checked:
@@ -255,6 +269,7 @@ def show_popup_menu(event):
     
     
 # ICONS for the compound menu
+# attaching the images for each and every function
 new_file_icon = PhotoImage(file='icons/new_file.gif')
 open_file_icon = PhotoImage(file='icons/open_file.gif')
 save_file_icon = PhotoImage(file='icons/save.gif')
@@ -267,6 +282,7 @@ find_icon = PhotoImage(file='icons/find_text.gif')
 
 
 #MENU CODES GOES HERE
+#we add various commands and we add their functionalities along and also, the triggers with them
 menu_bar = Menu(root) #menu begins
 
 file_menu = Menu(menu_bar, tearoff=0)
@@ -351,6 +367,7 @@ line_number_bar = Text(root, width=4, padx=3, takefocus=0, fg='white', border=0,
 line_number_bar.pack(side='left', fill='y')
 
 #adding the main context Text widget and Scrollbar Widget
+# providing the scroll function by creating a scrollbar and using its various attributes
 content_text = Text(root, wrap='word')
 content_text.pack(expand='yes', fill='both')
 
@@ -359,7 +376,7 @@ content_text.configure(yscrollcommand=scroll_bar.set)
 scroll_bar.config(command=content_text.yview)
 scroll_bar.pack(side='right', fill='y')
 
-# addind cursor info label
+# adding cursor info label
 cursor_info_bar = Label(content_text, text='Line: 1 | Column: 1')
 cursor_info_bar.pack(expand='no', fill=None, side='right', anchor='se')
 
@@ -374,6 +391,7 @@ content_text.bind('<Button-3>', show_popup_menu)
 
 
 #handling binding
+# we bind together, the events with their functions through 'bind'
 
 content_text.bind('<Control-N>', new_file)
 content_text.bind('<Control-n>', new_file)
